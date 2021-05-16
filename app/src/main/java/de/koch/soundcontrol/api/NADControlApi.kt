@@ -6,7 +6,6 @@ import retrofit2.http.POST
 
 interface NADControlApi {
 
-
     @GET("/power")
     fun getPower(): Call<NADResponse>
 

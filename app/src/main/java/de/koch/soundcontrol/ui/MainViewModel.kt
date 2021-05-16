@@ -1,10 +1,8 @@
 package de.koch.soundcontrol.ui
 
-import android.util.Log
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import de.koch.soundcontrol.api.*
 import de.koch.soundcontrol.api.APIClient
 import retrofit2.Call
@@ -34,11 +32,11 @@ class MainViewModel : ViewModel() {
     }
 
     fun powerOn() {
-        callPost({ client.powerOn() }, ifSuccess = { power.value = true })
+        callPost(client.powerOn(), ifSuccess = { power.value = true })
     }
 
     fun powerOff() {
-        callPost({ client.powerOff() }, ifSuccess = {
+        callPost(client.powerOff(), ifSuccess = {
             power.value = false
             mute.value = false
             speakerA.value = false
@@ -48,45 +46,45 @@ class MainViewModel : ViewModel() {
     }
 
     fun enableSpeakerA() {
-        callPost({ client.enableSpeakerA() }, ifSuccess = { speakerA.value = true })
+        callPost(client.enableSpeakerA(), ifSuccess = { speakerA.value = true })
     }
 
     fun enableSpeakerB() {
-        callPost({ client.enableSpeakerB() }, ifSuccess = { speakerB.value = true })
+        callPost(client.enableSpeakerB(), ifSuccess = { speakerB.value = true })
     }
 
     fun disableSpeakerA() {
-        callPost({ client.disableSpeakerA() }, ifSuccess = { speakerA.value = false })
+        callPost(client.disableSpeakerA(), ifSuccess = { speakerA.value = false })
     }
 
     fun disableSpeakerB() {
-        callPost({ client.disableSpeakerB() }, ifSuccess = { speakerB.value = false })
+        callPost(client.disableSpeakerB(), ifSuccess = { speakerB.value = false })
     }
 
     private fun muteOn() {
-        callPost({ client.muteOn() }, ifSuccess = { mute.value = true })
+        callPost(client.muteOn(), ifSuccess = { mute.value = true })
     }
 
     private fun muteOff() {
-        callPost({ client.muteOff() }, ifSuccess = { mute.value = false })
+        callPost(client.muteOff(), ifSuccess = { mute.value = false })
     }
 
     fun volumeUp() {
-        callPost({ client.volumeUp() }, ifSuccess = {})
+        callPost(client.volumeUp(), ifSuccess = {})
     }
 
     fun volumeDown() {
-        callPost({ client.volumeDown() }, ifSuccess = {})
+        callPost(client.volumeDown(), ifSuccess = {})
     }
 
     fun setSource(selectedSource: Source) {
         when (selectedSource) {
-            Source.CD -> callPost({ client.setSourceCd() }, ifSuccess = { source.value = Source.CD })
-            Source.AUX -> callPost({ client.setSourceAux() }, ifSuccess = { source.value = Source.AUX })
-            Source.MP -> callPost({ client.setSourceMp() }, ifSuccess = { source.value = Source.MP })
-            Source.PHONO -> callPost({ client.setSourcePhono() }, ifSuccess = { source.value = Source.PHONO })
-            Source.TAPE2 -> callPost({ client.setSourceTape2() }, ifSuccess = { source.value = Source.TAPE2 })
-            Source.TUNER -> callPost({ client.setSourceTuner() }, ifSuccess = { source.value = Source.TUNER })
+            Source.CD -> callPost(client.setSourceCd(), ifSuccess = { source.value = Source.CD })
+            Source.AUX -> callPost(client.setSourceAux(), ifSuccess = { source.value = Source.AUX })
+            Source.MP -> callPost(client.setSourceMp(), ifSuccess = { source.value = Source.MP })
+            Source.PHONO -> callPost(client.setSourcePhono(), ifSuccess = { source.value = Source.PHONO })
+            Source.TAPE2 -> callPost(client.setSourceTape2(), ifSuccess = { source.value = Source.TAPE2 })
+            Source.TUNER -> callPost(client.setSourceTuner(), ifSuccess = { source.value = Source.TUNER })
         }
     }
 
@@ -129,10 +127,10 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    private fun callPost(function: () -> Call<NADResponse>, ifSuccess: () -> Unit) {
+    private fun callPost(function: Call<NADResponse>, ifSuccess: () -> Unit) {
         if (::client.isInitialized) {
             loading.value = true
-            (function as Call<NADResponse>).enqueue(object : Callback<NADResponse> {
+            function.enqueue(object : Callback<NADResponse> {
                 override fun onResponse(
                     call: Call<NADResponse>,
                     response: Response<NADResponse>
@@ -184,10 +182,6 @@ class MainViewModel : ViewModel() {
                 }
 
                 override fun onFailure(call: Call<NADResponse>, t: Throwable) {
-                    t.message?.let {
-                        FirebaseCrashlytics.getInstance().log(t.stackTraceToString())
-                        FirebaseCrashlytics.getInstance().recordException(t)
-                    }
                     error.value = t.message.toString()
                     loading.value = false
                 }
