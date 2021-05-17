@@ -44,7 +44,6 @@ class MainActivity : AppCompatActivity(), SettingsDialog.IPDialogListener {
                 "Set your IP Config",
                 Toast.LENGTH_SHORT
             ).show()
-            viewModel.initNetwork("0000", "9000")
         } else {
             viewModel.initNetwork(ipSaveState, portSaveState)
             viewModel.initialize()
