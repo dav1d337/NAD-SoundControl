@@ -13,7 +13,7 @@ class MainViewModel : ViewModel() {
 
     private var client: NADControlApi? = null
 
-    val error = MutableLiveData<String>()
+    val error = MutableLiveData<String?>()
     val power = MutableLiveData(false)
     val mute = MutableLiveData<Boolean>()
     val speakerA = MutableLiveData<Boolean>()

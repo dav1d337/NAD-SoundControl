@@ -13,10 +13,10 @@ import de.koch.soundcontrol.R
 
 class SettingsDialog : DialogFragment() {
 
-    private lateinit var listener: IPDialogListener
+    private lateinit var listener: SettingsDialogListener
 
-    interface IPDialogListener {
-        fun onDialogPositiveClick(ip: String, port: String)
+    interface SettingsDialogListener {
+        fun onDialogPositiveClick(ip: String, port: String, btName: String)
         fun onVibrateClick(vibration: Boolean)
     }
 
@@ -27,6 +27,7 @@ class SettingsDialog : DialogFragment() {
 
             val ipSave = sharedPref.getString(getString(R.string.ip_key), "")
             val portSave = sharedPref.getString(getString(R.string.port_key), "")
+            val btSave = sharedPref.getString(getString(R.string.btdevice_key), "")
 
             val linLayout = LinearLayout(context)
             linLayout.orientation = LinearLayout.VERTICAL
@@ -36,29 +37,35 @@ class SettingsDialog : DialogFragment() {
             val portInput = EditText(context)
             portInput.setText(portSave)
             portInput.hint = "Port"
+            val btInput = EditText(context)
+            btInput.setText(btSave)
+            btInput.hint = "Bluetooth Device Name"
             val vibrateCheckbox = CheckBox(context)
             vibrateCheckbox.text = "Enable Vibration"
 
             val checked = sharedPref.getBoolean(getString(R.string.vibrate_key), true)
             vibrateCheckbox.isChecked = checked
-            vibrateCheckbox.setOnClickListener {v->
+            vibrateCheckbox.setOnClickListener { v ->
                 listener.onVibrateClick((v as CheckBox).isChecked)
             }
 
             linLayout.addView(ipInput)
             linLayout.addView(portInput)
+            linLayout.addView(btInput)
             linLayout.addView(vibrateCheckbox)
             builder.setView(linLayout)
 
-            builder.setMessage("IP Config")
-                .setPositiveButton("Set",
-                    DialogInterface.OnClickListener { dialog, id ->
-                        listener.onDialogPositiveClick(ipInput.text.toString().trim(), portInput.text.toString().trim())
-                    })
-                .setNegativeButton("Cancel",
-                    DialogInterface.OnClickListener { dialog, id ->
-                        // User cancelled the dialog
-                    })
+            builder.setMessage("Settings")
+                .setPositiveButton(
+                    "Apply"
+                ) { dialog, id ->
+                    listener.onDialogPositiveClick(ipInput.text.toString().trim(), portInput.text.toString().trim(), btInput.text.toString())
+                }
+                .setNegativeButton(
+                    "Cancel"
+                ) { dialog, id ->
+                    // User cancelled the dialog
+                }
 
             builder.create()
         } ?: throw IllegalStateException("Activity cannot be null")
@@ -67,10 +74,12 @@ class SettingsDialog : DialogFragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         try {
-            listener = context as IPDialogListener
+            listener = context as SettingsDialogListener
         } catch (e: ClassCastException) {
-            throw ClassCastException((context.toString() +
-                    " must implement NoticeDialogListener"))
+            throw ClassCastException(
+                (context.toString() +
+                        " must implement IPDialogListener")
+            )
         }
     }
 }

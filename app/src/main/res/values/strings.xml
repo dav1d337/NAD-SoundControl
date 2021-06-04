@@ -4,5 +4,6 @@
     <string name="ip_key">ip_save</string>
     <string name="port_key">port_save</string>
     <string name="vibrate_key">vibrate_save</string>
+    <string name="btdevice_key">btdevice_save</string>
 
 </resources>
